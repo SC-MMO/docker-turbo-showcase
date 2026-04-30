@@ -17,7 +17,7 @@ services:
       context: .
       dockerfile: apps/backend/Dockerfile
     working_dir: /app
-    command: sh -c "pnpm install && pnpm --filter backend dev"
+    command: sh -c "pnpm install && pnpm --filter @repo/db run generate && pnpm --filter backend dev"
     ports:
       - "3000:3000"
     volumes:

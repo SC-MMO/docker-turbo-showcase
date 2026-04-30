@@ -1,5 +1,5 @@
 .pnpm-store
 node_modules
-pnpm-workspace.yaml
 build
+built
 generated

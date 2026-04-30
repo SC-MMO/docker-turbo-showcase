@@ -1,0 +1,48 @@
+services:
+  db:
+    image: postgres:13
+    container_name: postgres-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: app2
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    working_dir: /app
+    command: sh -c "pnpm install && pnpm --filter backend dev"
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - pnpm_store:/root/.pnpm-store
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/app2?schema=public
+      SECRET_KEY: EXPRESS_TEST_SECRET_KEY
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+    working_dir: /app
+    command: sh -c "pnpm install && pnpm --filter frontend dev"
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - pnpm_store:/root/.pnpm-store
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  pnpm_store:
